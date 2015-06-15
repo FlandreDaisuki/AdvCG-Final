@@ -16,7 +16,7 @@ function Ready(interactive, complete) {
 };
 
 function Init() {
-    scene = new Object3D();
+    scene = new Scene();
     var yuka = [new Vector3(300, 0, 300), new Vector3(300, 0, -300), new Vector3(-300, 0, -300), new Vector3(-300, 0, 300)];
 
     var t1 = new Triangle(yuka[0], yuka[1], yuka[2]);
