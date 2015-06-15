@@ -9,6 +9,10 @@ Object3D = function () {
 
 Object3DIdCount = 0;
 
+Object3D.prototype.setPosition = function ( v ) {
+    this.position = v;
+}
+
 // Sphere extend Object3D
 Sphere = function ( center, radius ) {
     Object3D.call( this );
@@ -23,9 +27,8 @@ Sphere = function ( center, radius ) {
     this.radius = ( radius !== undefined ) ? radius : 5;
 }
 
-Sphere.prototype = {
-    constructor: Sphere
-};
+Sphere.prototype = Object.create( Object3D.prototype );
+Sphere.prototype.constructor = Sphere;
 
 // Triangle extend Object3D
 Triangle = function ( a, b, c ) {
@@ -37,9 +40,8 @@ Triangle = function ( a, b, c ) {
     this.c = ( c !== undefined ) ? c : new Vector3();
 }
 
-Triangle.prototype = {
-    constructor: Triangle
-};
+Triangle.prototype = Object.create( Object3D.prototype );
+Triangle.prototype.constructor = Triangle;
 
 // Scene extend Object3D
 Scene = function () {
@@ -47,9 +49,8 @@ Scene = function () {
     this.type = 'Scene';
 }
 
-Scene.prototype = {
-    constructor: Scene
-};
+Scene.prototype = Object.create( Object3D.prototype );
+Scene.prototype.constructor = Scene;
 
 // Camera extend Object3D
 Camera = function ( fov ) {
@@ -59,13 +60,15 @@ Camera = function ( fov ) {
     this.fov = ( fov !== undefined ) ? fov : 50; //degree
 }
 
-Camera.prototype = {
-    constructor: Camera,
-    fovDegree: function () {
-        return this.fov;
-    },
-    fovRad: function () {
-        return this.fov * Math.PI / 180;
-    }
-};
+Camera.prototype = Object.create( Object3D.prototype );
+Camera.prototype.constructor = Camera;
+
+Camera.prototype.fovDegree = function () {
+    return this.fov;
+}
+
+Camera.prototype.fovRad = function () {
+    return this.fov * Math.PI / 180;
+}
+
 
