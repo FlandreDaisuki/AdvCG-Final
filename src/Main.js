@@ -23,5 +23,8 @@ function Init() {
     var t2 = new Triangle(yuka[3], yuka[0], yuka[2]);
 
     scene.children.push(t1, t2);
+
+    camera = new Camera();
+    camera.setPosition(new Vector3(0, 0, 50));
 }
-var scene;
+var scene, camera;
