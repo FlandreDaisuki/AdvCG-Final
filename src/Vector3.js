@@ -19,3 +19,25 @@ Vector3.prototype.subScalar = function ( s ) {
     this.z -= s;
     return this;
 }
+
+Vector3.prototype.divideScalar = function ( scalar ) {
+    if ( scalar !== 0 ) {
+        var invScalar = 1 / scalar;
+        this.x *= invScalar;
+        this.y *= invScalar;
+        this.z *= invScalar;
+    } else {
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+    }
+    return this;
+}
+
+Vector3.prototype.length = function () {
+    return Math.sqrt( this.x * this.x + this.y * this.y + this.z * this.z );
+}
+
+Vector3.prototype.normalize = function () {
+    return this.divideScalar( this.length() );
+}
