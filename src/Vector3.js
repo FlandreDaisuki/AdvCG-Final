@@ -6,6 +6,13 @@ Vector3 = function ( x, y, z ) {
 
 Vector3.prototype.constructor = Vector3;
 
+Vector3.prototype.copy = function ( v ) {
+    this.x = v.x;
+    this.y = v.y;
+    this.z = v.z;
+    return this;
+}
+
 Vector3.prototype.subVectors = function ( a, b ) {
     this.x = a.x - b.x;
     this.y = a.y - b.y;
