@@ -9,9 +9,7 @@ Color = function ( color ) {
 
 Color.prototype = {
     constructor: Color,
-    r = 1,
-    g = 1,
-    b = 1,
+    r : 1, g : 1, b : 1,
     set: function ( value ) {
 
         if ( value instanceof Color ) {
