@@ -40,10 +40,17 @@ Ray.prototype.isIntersectionSphere = function ( sphere ) {
 Ray.prototype.intersectSphere = function () {
     // from http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-sphere-intersection/
     var v1 = new Vector3();
-
+    var photon = {  position: new Vector3(),
+                    on: undefined,
+                    fromRay: new Ray(),
+                    
+                    //reflaction side normal (photon.normal.dot( photon.fromRay.direction ) <= 0)
+                    normal: new Vector3() };
     return function ( sphere, optionalTarget ) {
 
         v1.subVectors( sphere.center, this.origin );
+        photon.on = sphere;
+        photon.fromRay = this;
 
         var tca = v1.dot( this.direction );
 
@@ -67,9 +74,15 @@ Ray.prototype.intersectSphere = function () {
         // test to see if t0 is behind the ray:
         // if it is, the ray is inside the sphere, so return the second exit point scaled by t1,
         // in order to always return an intersect point that is in front of the ray.
-        if ( t0 < 0 ) return this.at( t1, optionalTarget );
+        if ( t0 < 0 ) {
+            photon.position = this.at( t1, optionalTarget );
+            photon.normal.copy( photon.position ).sub( sphere.center );
+            return photon;
+        }
 
-        // else t0 is in front of the ray, so return the first collision point scaled by t0 
-        return this.at( t0, optionalTarget );
+        // else t0 is in front of the ray, so return the first collision point scaled by t0
+        photon.position = this.at( t0, optionalTarget );
+        photon.normal.copy( photon.position ).sub( sphere.center );
+        return photon;
     }
 }()
