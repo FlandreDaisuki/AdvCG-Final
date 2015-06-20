@@ -71,4 +71,11 @@ Camera.prototype.fovRad = function () {
     return this.fov * Math.PI / 180;
 }
 
+// Light extend Object3D
+Light = function () {
+    Object3D.call( this );
+    this.type = 'Light';
+}
 
+Light.prototype = Object.create( Object3D.prototype );
+Light.prototype.constructor = Light;
