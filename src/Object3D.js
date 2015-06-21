@@ -5,12 +5,17 @@ Object3D = function () {
 
     this.children = [];
     this.position = new Vector3();
+    this.material = new Material();
 }
 
 Object3DIdCount = 0;
 
 Object3D.prototype.setPosition = function ( v ) {
-    this.position = v;
+    this.position.copy(v);
+}
+
+Object3D.prototype.setMaterial = function ( m ) {
+    this.material.copy(m);
 }
 
 // Sphere extend Object3D
@@ -47,6 +52,7 @@ Triangle.prototype.constructor = Triangle;
 Scene = function () {
     Object3D.call( this );
     this.type = 'Scene';
+    this.lights = [];
 }
 
 Scene.prototype = Object.create( Object3D.prototype );
