@@ -3,6 +3,8 @@ Material = function ( material ) {
         this.copy( material );
     }
 
+    material = ( material !== undefined ) ? material : {};
+
     this.glossy = ( material.glossy !== undefined ) ? material.glossy : 0; // 0~1
     this.refractable = ( material.refractable !== undefined ) ? material.refractable : false;
 
@@ -12,7 +14,7 @@ Material = function ( material ) {
     //      e.g. in_v + 3*norm (refract_n = 3) => refract into bigger density
     //      e.g. in_v + -3*norm (refract_n = -3) => refract into smaller density
     this.refract_n = ( material.refract_n !== undefined && this.refractable ) ? material.refract_n : 0;
-    this.color = ( material.color !== undefined ) ? material.color : new Color();
+    this.color = ( material.color !== undefined ) ? material.color : new Color(0x000000);
 }
 
 Material.prototype.constructor = Material;
