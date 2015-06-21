@@ -171,3 +171,16 @@ Ray.prototype.intersectTriangle = function ( triangle, backfaceCulling, optional
     photon.position = this.at( QdN / DdN, optionalTarget );
     return photon;
 }
+
+Ray.prototype.intersectObject = function( object ) {
+    
+    if (object instanceof(Sphere)) {
+        return this.intersectSphere(object);
+    }
+
+    if (object instanceof(Triangle)) {
+        return this.intersectTriangle(object);
+    }
+
+    return null;
+}
