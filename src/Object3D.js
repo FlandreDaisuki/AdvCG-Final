@@ -5,17 +5,12 @@ Object3D = function () {
 
     this.children = [];
     this.position = new Vector3();
-    this.material = new Material();
 }
 
 Object3DIdCount = 0;
 
 Object3D.prototype.setPosition = function ( v ) {
     this.position.copy(v);
-}
-
-Object3D.prototype.setMaterial = function ( m ) {
-    this.material.copy(m);
 }
 
 // Sphere extend Object3D
@@ -30,11 +25,15 @@ Sphere = function ( center, radius ) {
     }
 
     this.radius = ( radius !== undefined ) ? radius : 5;
+    this.material = new Material();
 }
 
 Sphere.prototype = Object.create( Object3D.prototype );
 Sphere.prototype.constructor = Sphere;
 
+Sphere.prototype.setMaterial = function ( m ) {
+    this.material.copy(m);
+}
 // Triangle extend Object3D
 Triangle = function ( a, b, c ) {
     Object3D.call( this );
@@ -43,11 +42,16 @@ Triangle = function ( a, b, c ) {
     this.a = ( a !== undefined ) ? a : new Vector3();
     this.b = ( b !== undefined ) ? b : new Vector3();
     this.c = ( c !== undefined ) ? c : new Vector3();
+    this.material = new Material();
+
 }
 
 Triangle.prototype = Object.create( Object3D.prototype );
 Triangle.prototype.constructor = Triangle;
 
+Triangle.prototype.setMaterial = function ( m ) {
+    this.material.copy(m);
+}
 // Scene extend Object3D
 Scene = function () {
     Object3D.call( this );
