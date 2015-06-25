@@ -57,6 +57,7 @@ Scene = function () {
     Object3D.call( this );
     this.type = 'Scene';
     this.lights = [];
+    this.color = new Color(0x333333);
 }
 
 Scene.prototype = Object.create( Object3D.prototype );

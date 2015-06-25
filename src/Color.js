@@ -158,6 +158,19 @@ Color.prototype = {
         return array;
     },
 
+    toCanvasArray: function ( array, offset ) {
+
+        if ( array === undefined ) array = [];
+        if ( offset === undefined ) offset = 0;
+
+        array[ offset + 0 ] = this.r * 255;
+        array[ offset + 1 ] = this.g * 255;
+        array[ offset + 2 ] = this.b * 255;
+        array[ offset + 3 ] = 255;
+
+        return array;
+    },
+
     clone: function () {
         return new Color().setRGB( this.r, this.g, this.b );
     }

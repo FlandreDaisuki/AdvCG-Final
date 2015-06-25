@@ -9,10 +9,12 @@ Material = function ( material ) {
     this.refractable = ( material.refractable !== undefined ) ? material.refractable : false;
 
     //  let in_v, norm, out_v are defined and normalized
-    //      α*in_v + β*norm = out_v, then refract_n = β / α
-    //      e.g. in_v + 0*norm (refract_n = 0) => no refract
-    //      e.g. in_v + 3*norm (refract_n = 3) => refract into bigger density
-    //      e.g. in_v + -3*norm (refract_n = -3) => refract into smaller density
+    //
+    //      α * in_v + β * norm = out_v, then refract_n = β / α
+    //
+    //      e.g. in_v + 0 * norm (refract_n = 0) => no refract
+    //      e.g. in_v + 3 * norm (refract_n = 3) => refract into bigger density
+    //      e.g. in_v + -3 * norm (refract_n = -3) => refract into smaller density
     this.refract_n = ( material.refract_n !== undefined && this.refractable ) ? material.refract_n : 0;
     this.color = ( material.color !== undefined ) ? material.color : new Color(0x000000);
 }

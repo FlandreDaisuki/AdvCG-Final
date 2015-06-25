@@ -17,6 +17,7 @@ var scene, camera, canvas;
 
 Ready( function () {
     Init();
+    GlobalIlumination ( scene );
     Render( scene, camera );
 } );
 
@@ -45,15 +46,47 @@ function Init() {
     scene.children.push( s1 );
 
     camera = new Camera();
-    camera.setPosition( new Vector3( 0, 100, 300 ) );
+    camera.setPosition( new Vector3( 0, 100, 250 ) );
 
     var light1 = new Light();
-    light1.setPosition( new Vector3( 100, 100, 150 ) );
+    light1.setPosition( new Vector3( 100, 150, 200 ) );
     scene.lights.push( light1 );
 }
 
-function GlobalIlumination = function ( scene ) {
+function GlobalIlumination ( scene ) { // about 16 K photons
+    var photonMap = [];
 
+    for (var i = 0; i < 100000; i++) {
+        var randdir = new Vector3(Math.floor(Math.random()*100000) - 50000, Math.floor(Math.random()*100000) - 50000, Math.floor(Math.random()*100000) - 50000);
+        var lightRay = new Ray(scene.lights[0].position, randdir);
+
+        var mapped = scene.children.map(function ( obj ) {
+            var hit = lightRay.intersectObject( obj );
+            return (hit !== null) ? hit : null;
+        });
+
+        mapped = mapped.filter(function( hit ){
+             return (hit !== null);
+        });
+        
+        if(mapped.length > 0) {
+
+            // var minhit = mapped[0];
+            // mapped.forEach(function( hit ){
+            //     if( minhit.position.distanceToSquared(scene.lights[0].position) >
+            //         hit.position.distanceToSquared(scene.lights[0].position) )
+            //     {
+            //         minhit = hit;
+            //     }
+            // });
+
+            var minhit = Nearest( scene.lights[0].position, mapped );
+
+            photonMap.push(minhit);
+        }
+    }
+
+    scene.photonMap = photonMap;
 }
 
 function Render( scene, camera ) {
@@ -72,26 +105,53 @@ function Render( scene, camera ) {
             var raydir = new Vector3( cvsw - hf_cvsw, hf_cvsh - cvsh, -focusDis );
             var ray = new Ray( camera.position, raydir );
 
-            var filtered = scene.children.filter( function ( obj ) {
-
+            var filtered = scene.children.map( function ( obj ) {
                 var hit = ray.intersectObject( obj );
+                return ( hit !== null ) ? hit : null;
+            } );
 
+            filtered = filtered.filter( function ( hit ) {
                 return hit !== null;
             } );
 
             if ( filtered.length > 0 ) {
-                pixels.data[ coloroffset + 0 ] = 255;
-                pixels.data[ coloroffset + 1 ] = 150;
-                pixels.data[ coloroffset + 2 ] = 150;
-                pixels.data[ coloroffset + 3 ] = 255;
+                var cameraHit = Nearest( ray.origin, filtered );
+                //debugger;
+                var photonCollection = scene.photonMap.map(function(p){
+                    return (p.position.distanceToSquared(cameraHit.position) < 49) ? p : null;
+                });
+                photonCollection = photonCollection.filter( function ( p ) {
+                    return p !== null;
+                } );
+                var obj_color = cameraHit.on.material.color.clone();
+                obj_color.multiplyScalar(photonCollection.length * 0.02).toCanvasArray( pixels.data, coloroffset );
             } else {
-                pixels.data[ coloroffset + 0 ] = 50;
-                pixels.data[ coloroffset + 1 ] = 50;
-                pixels.data[ coloroffset + 2 ] = 50;
-                pixels.data[ coloroffset + 3 ] = 255;
+                scene.color.toCanvasArray( pixels.data, coloroffset );
             }
         }
     }
 
     ctx.putImageData( pixels, 0, 0 );
+}
+
+
+function Nearest( targetVector, objArray ) {
+    // targetVector : Vector3
+    // objArray : an array of objs that has position prop(Vector3)
+    // this function can't use on Sphere and Triangle 
+
+    if ( objArray.length <= 0 ) {
+        return null;
+    } else if ( objArray.length == 1 ) {
+        return objArray[ 0 ];
+    } else {
+        var n = objArray[ 0 ];
+        objArray.forEach( function ( c ) {
+            if ( n.position.distanceToSquared( targetVector ) >
+                c.position.distanceToSquared( targetVector ) ) {
+                n = c;
+            }
+        } );
+        return n;
+    }
 }
