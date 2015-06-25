@@ -1,5 +1,9 @@
 # AdvCG-Final
 
+Many code from [three.js](https://github.com/mrdoob/three.js/)
+
+The simplest implementation of Photon mapping.
+
 # Result
 
 ## Diffuse render
@@ -29,3 +33,7 @@ render equation: material color * 1/16 + (material color * 1/16 + 1/256) * photo
 300000 times random spread photons (31635 photons collected)
 collection range: 5
 render time: 297.588 seconds
+
+# Lisence
+
+The MIT License
