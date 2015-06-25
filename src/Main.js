@@ -16,9 +16,14 @@ function Ready( interactive, complete ) {
 var scene, camera, canvas;
 
 Ready( function () {
+    var st = Date.now();
+
     Init();
     GlobalIlumination ( scene );
     Render( scene, camera );
+
+    console.log( 'scene.photonMap.length: ' + scene.photonMap.length );
+    console.log( (Date.now() - st) +' seconds');
 } );
 
 function Init() {
@@ -53,10 +58,10 @@ function Init() {
     scene.lights.push( light1 );
 }
 
-function GlobalIlumination ( scene ) { // about 16 K photons
+function GlobalIlumination ( scene ) {
     var photonMap = [];
 
-    for (var i = 0; i < 100000; i++) {
+    for (var i = 0; i < 300000; i++) {
         var randdir = new Vector3(Math.floor(Math.random()*100000) - 50000, Math.floor(Math.random()*100000) - 50000, Math.floor(Math.random()*100000) - 50000);
         var lightRay = new Ray(scene.lights[0].position, randdir);
 
@@ -70,15 +75,6 @@ function GlobalIlumination ( scene ) { // about 16 K photons
         });
         
         if(mapped.length > 0) {
-
-            // var minhit = mapped[0];
-            // mapped.forEach(function( hit ){
-            //     if( minhit.position.distanceToSquared(scene.lights[0].position) >
-            //         hit.position.distanceToSquared(scene.lights[0].position) )
-            //     {
-            //         minhit = hit;
-            //     }
-            // });
 
             var minhit = Nearest( scene.lights[0].position, mapped );
 
@@ -118,13 +114,15 @@ function Render( scene, camera ) {
                 var cameraHit = Nearest( ray.origin, filtered );
                 //debugger;
                 var photonCollection = scene.photonMap.map(function(p){
-                    return (p.position.distanceToSquared(cameraHit.position) < 49) ? p : null;
+                    return (p.position.distanceToSquared(cameraHit.position) < 25) ? p : null;
                 });
                 photonCollection = photonCollection.filter( function ( p ) {
                     return p !== null;
                 } );
-                var obj_color = cameraHit.on.material.color.clone();
-                obj_color.multiplyScalar(photonCollection.length * 0.02).toCanvasArray( pixels.data, coloroffset );
+                var obj_color = cameraHit.on.material.color.clone().multiplyScalar( 1/16 );
+                var light_color = scene.lights[0].color.clone().multiplyScalar( 1/256 );
+                var offsetColor = new Color(obj_color).add(light_color).multiplyScalar( photonCollection.length );
+                obj_color.add( offsetColor ).toCanvasArray( pixels.data, coloroffset );
             } else {
                 scene.color.toCanvasArray( pixels.data, coloroffset );
             }
