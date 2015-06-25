@@ -86,6 +86,7 @@ Camera.prototype.fovRad = function () {
 Light = function () {
     Object3D.call( this );
     this.type = 'Light';
+    this.color = new Color(0xFFFFFF);
 }
 
 Light.prototype = Object.create( Object3D.prototype );
