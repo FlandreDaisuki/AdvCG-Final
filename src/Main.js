@@ -14,7 +14,7 @@ function Ready( interactive, complete ) {
 };
 
 var scene, camera, canvas;
-var GLOBAL_RANDOM_PHOTON = 100000;
+var GLOBAL_RANDOM_PHOTON = 300000;
 var COLLECT_RANGE_SQUARE = 25;
 
 Ready( function () {
