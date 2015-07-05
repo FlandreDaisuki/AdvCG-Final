@@ -8,7 +8,7 @@ The simplest implementation of Photon mapping.
 
 Default Material
 
-- color: 0x00000
+- color: 0x000000
 - glossyFactor: 0
 - Kd = Ka = Ks : 1, 1, 1
 
