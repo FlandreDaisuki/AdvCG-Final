@@ -14,6 +14,8 @@ function Ready( interactive, complete ) {
 };
 
 var scene, camera, canvas;
+var GLOBAL_RANDOM_PHOTON = 100000;
+var COLLECT_RANGE_SQUARE = 25;
 
 Ready( function () {
     var st = Date.now();
@@ -22,8 +24,15 @@ Ready( function () {
     GlobalIlumination( scene );
     Render( scene, camera );
 
-    console.log( 'scene.photonMap.length: ' + scene.photonMap.length );
-    console.log( ( Date.now() - st ) + ' seconds' );
+    console.log( GLOBAL_RANDOM_PHOTON + ' times random spread photons (' + scene.photonMap.length + ' photons collected)' );
+    console.log( 'collection range: ' + Math.sqrt( COLLECT_RANGE_SQUARE ) );
+    console.log( 'render time: ' + ( Date.now() - st ) / 1000 + ' seconds' );
+
+    console.log( 'Sphere color: ' + scene.children[ 2 ].material.color.toArray() );
+    console.log( 'Sphere Ka: ' + scene.children[ 2 ].material.ka.toArray() );
+    console.log( 'Sphere Kd: ' + scene.children[ 2 ].material.kd.toArray() );
+    console.log( 'Sphere Ks: ' + scene.children[ 2 ].material.ks.toArray() );
+    console.log( 'Sphere glossyFactor: ' + scene.children[ 2 ].material.glossy );
 } );
 
 function Init() {
@@ -42,7 +51,7 @@ function Init() {
 
     var s1 = new Sphere( new Vector3( 0, 100, 150 ), 50 );
     s1.setMaterial( new Material( {
-        glossy: 8,
+        glossy: 32,
         refractable: true,
         refract_n: 5,
         color: new Color( 0x0000ff ),
@@ -63,9 +72,11 @@ function Init() {
 
 function GlobalIlumination( scene ) {
     var photonMap = [];
+    var BIG = 100000;
+    var halfBIG = Math.floor(BIG / 2);
 
-    for ( var i = 0; i < 100000; i++ ) {
-        var randdir = new Vector3( Math.floor( Math.random() * 100000 ) - 50000, Math.floor( Math.random() * 100000 ) - 50000, Math.floor( Math.random() * 100000 ) - 50000 );
+    for ( var i = 0; i < GLOBAL_RANDOM_PHOTON; i++ ) {
+        var randdir = new Vector3( Math.floor( Math.random() * BIG ) - halfBIG, Math.floor( Math.random() * BIG ) - halfBIG, Math.floor( Math.random() * BIG ) - halfBIG );
         var lightRay = new Ray( scene.lights[ 0 ].position, randdir );
 
         var mapped = scene.children.map( function ( obj ) {
@@ -117,7 +128,7 @@ function Render( scene, camera ) {
                 var cameraHit = Nearest( ray.origin, filtered );
                 //debugger;
                 var photonCollection = scene.photonMap.map( function ( p ) {
-                    return ( p.position.distanceToSquared( cameraHit.position ) < 25 ) ? p : null;
+                    return ( p.position.distanceToSquared( cameraHit.position ) < COLLECT_RANGE_SQUARE ) ? p : null;
                 } );
                 photonCollection = photonCollection.filter( function ( p ) {
                     return p !== null;

@@ -6,33 +6,44 @@ The simplest implementation of Photon mapping.
 
 # Result
 
-## Diffuse render
+Default Material
 
-render equation: material color * photons in range * 0.02 (* 0xFF for RGB)
+- color: 0x00000
+- glossyFactor: 0
+- Kd = Ka = Ks : 1, 1, 1
 
-![](./img/01.png)
-100000 times random spread photons (10402 photons collected)
-collection range: 7
-render time: 92.195 seconds
+## Exp1: glossyFactor
 
-![](./img/02.png)
-200000 times random spread photons (20988 photons collected)
-collection range: 7
-render time: 192.242 seconds
+- 100000 times random spread photons
+- collection range: 5
 
-![](./img/03.png)
-300000 times random spread photons (31152 photons collected)
-collection range: 7
-render time: 286.749 seconds
+Sphere Material
 
-## Fake Glossy
+- Sphere color: 0, 0, 1
+- Sphere Ka: 0.5, 0.5, 0.5
+- Sphere Kd: 0.05, 0.05, 0.05
+- Sphere Ks: 0.5, 0.5, 0.5
 
-render equation: material color * 1/16 + (material color * 1/16 + 1/256) * photons in range (* 0xFF for RGB)
+![](./img/x1.png)
 
-![](./img/06.png)
-300000 times random spread photons (31635 photons collected)
-collection range: 5
-render time: 297.588 seconds
+10532 photons collected
+render time: 93.978 seconds
+
+Sphere glossyFactor: 8
+
+![](./img/x2.png)
+
+10481 photons collected
+render time: 91.478 seconds
+
+Sphere glossyFactor: 16
+
+![](./img/x3.png)
+
+10288 photons collected
+render time: 90.121 seconds
+
+Sphere glossyFactor: 32
 
 # Lisence
 
