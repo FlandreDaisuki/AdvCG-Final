@@ -19,11 +19,11 @@ Ready( function () {
     var st = Date.now();
 
     Init();
-    GlobalIlumination ( scene );
+    GlobalIlumination( scene );
     Render( scene, camera );
 
     console.log( 'scene.photonMap.length: ' + scene.photonMap.length );
-    console.log( (Date.now() - st) +' seconds');
+    console.log( ( Date.now() - st ) + ' seconds' );
 } );
 
 function Init() {
@@ -34,18 +34,21 @@ function Init() {
         color: new Color( 0x999999 )
     } )
     var t1 = new Triangle( new Vector3( 150, 0, 150 ), new Vector3( 150, 0, -150 ), new Vector3( -150, 0, -150 ) );
-    t1.setMaterial(floorMat);
+    t1.setMaterial( floorMat );
     var t2 = new Triangle( new Vector3( -150, 0, 150 ), new Vector3( 150, 0, 150 ), new Vector3( -150, 0, -150 ) );
-    t2.setMaterial(floorMat);
+    t2.setMaterial( floorMat );
 
     scene.children.push( t1, t2 );
 
     var s1 = new Sphere( new Vector3( 0, 100, 150 ), 50 );
     s1.setMaterial( new Material( {
-        glossy: 0.5,
+        glossy: 8,
         refractable: true,
         refract_n: 5,
-        color: new Color( 0x0000ff )
+        color: new Color( 0x0000ff ),
+        ka: new Color( 0.5, 0.5, 0.5 ),
+        kd: new Color( 0.05, 0.05, 0.05 ),
+        ks: new Color( 0.5, 0.5, 0.5 )
     } ) );
 
     scene.children.push( s1 );
@@ -58,27 +61,27 @@ function Init() {
     scene.lights.push( light1 );
 }
 
-function GlobalIlumination ( scene ) {
+function GlobalIlumination( scene ) {
     var photonMap = [];
 
-    for (var i = 0; i < 300000; i++) {
-        var randdir = new Vector3(Math.floor(Math.random()*100000) - 50000, Math.floor(Math.random()*100000) - 50000, Math.floor(Math.random()*100000) - 50000);
-        var lightRay = new Ray(scene.lights[0].position, randdir);
+    for ( var i = 0; i < 100000; i++ ) {
+        var randdir = new Vector3( Math.floor( Math.random() * 100000 ) - 50000, Math.floor( Math.random() * 100000 ) - 50000, Math.floor( Math.random() * 100000 ) - 50000 );
+        var lightRay = new Ray( scene.lights[ 0 ].position, randdir );
 
-        var mapped = scene.children.map(function ( obj ) {
+        var mapped = scene.children.map( function ( obj ) {
             var hit = lightRay.intersectObject( obj );
-            return (hit !== null) ? hit : null;
-        });
+            return ( hit !== null ) ? hit : null;
+        } );
 
-        mapped = mapped.filter(function( hit ){
-             return (hit !== null);
-        });
-        
-        if(mapped.length > 0) {
+        mapped = mapped.filter( function ( hit ) {
+            return ( hit !== null );
+        } );
 
-            var minhit = Nearest( scene.lights[0].position, mapped );
+        if ( mapped.length > 0 ) {
 
-            photonMap.push(minhit);
+            var minhit = Nearest( scene.lights[ 0 ].position, mapped );
+
+            photonMap.push( minhit );
         }
     }
 
@@ -113,16 +116,15 @@ function Render( scene, camera ) {
             if ( filtered.length > 0 ) {
                 var cameraHit = Nearest( ray.origin, filtered );
                 //debugger;
-                var photonCollection = scene.photonMap.map(function(p){
-                    return (p.position.distanceToSquared(cameraHit.position) < 25) ? p : null;
-                });
+                var photonCollection = scene.photonMap.map( function ( p ) {
+                    return ( p.position.distanceToSquared( cameraHit.position ) < 25 ) ? p : null;
+                } );
                 photonCollection = photonCollection.filter( function ( p ) {
                     return p !== null;
                 } );
-                var obj_color = cameraHit.on.material.color.clone().multiplyScalar( 1/16 );
-                var light_color = scene.lights[0].color.clone().multiplyScalar( 1/256 );
-                var offsetColor = new Color(obj_color).add(light_color).multiplyScalar( photonCollection.length );
-                obj_color.add( offsetColor ).toCanvasArray( pixels.data, coloroffset );
+
+                ColorCalc( cameraHit, photonCollection ).toCanvasArray( pixels.data, coloroffset );
+
             } else {
                 scene.color.toCanvasArray( pixels.data, coloroffset );
             }
@@ -153,3 +155,23 @@ function Nearest( targetVector, objArray ) {
         return n;
     }
 }
+
+function ColorCalc( cameraHit, photonCollecttion ) {
+    // https://en.wikipedia.org/wiki/Phong_reflection_model
+    var hitobj = cameraHit.on;
+    var objmat = hitobj.material;
+    var c = new Color( 0, 0, 0 );
+    c.add( objmat.color.clone().multiply( objmat.ka ) );
+
+    photonCollecttion.forEach( function ( p ) {
+        var LN = new Vector3().copy( p.reflect ).projectOnVector( p.normal );
+        var diffuse = objmat.color.clone().multiply( objmat.kd ).multiply( new Color( LN.x, LN.y, LN.z ) );
+        
+        var RV = new Vector3().copy( p.reflect ).normalize().dot(new Vector3().copy( cameraHit.fromRay.direction ).negate());
+        var glossy = new Color().copy(scene.lights[0].color).multiply( objmat.ks ).multiplyScalar( Math.pow(RV, objmat.glossy) );
+        c.add( diffuse ).add( glossy );
+    } );
+
+    return c;
+}
+

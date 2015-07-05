@@ -13,6 +13,10 @@ Vector3.prototype.copy = function ( v ) {
     return this;
 }
 
+Vector3.prototype.clone = function () {
+    return new Vector3(this.x, this.y, this.z);
+}
+
 Vector3.prototype.add = function ( v ) {
     this.x += v.x;
     this.y += v.y;
@@ -138,4 +142,15 @@ Vector3.prototype.distanceToSquared = function ( v ) {
     var dy = this.y - v.y;
     var dz = this.z - v.z;
     return dx * dx + dy * dy + dz * dz;
+}
+
+Vector3.prototype.projectOnVector = function ( vector ) {
+
+    var v1 = new Vector3(), dot;
+
+    v1.copy( vector ).normalize();
+
+    dot = this.dot( v1 );
+
+    return this.copy( v1 ).multiplyScalar( dot );
 }

@@ -44,8 +44,9 @@ Ray.prototype.intersectSphere = function ( sphere, optionalTarget ) {
         on: undefined,
         fromRay: new Ray(),
 
-        //reflaction side normal (photon.normal.dot( photon.fromRay.direction ) <= 0)
-        normal: new Vector3()
+        //reflection side normal (photon.normal.dot( photon.fromRay.direction ) <= 0)
+        normal: new Vector3(),
+        reflect:  new Vector3()
     };
 
     v1.subVectors( sphere.center, this.origin );
@@ -82,7 +83,14 @@ Ray.prototype.intersectSphere = function ( sphere, optionalTarget ) {
 
     // else t0 is in front of the ray, so return the first collision point scaled by t0
     photon.position = this.at( t0, optionalTarget );
-    photon.normal.copy( photon.position ).sub( sphere.center );
+    photon.normal.copy( photon.position ).sub( sphere.center ).normalize();
+
+    // R' = L'-2(L'.N')N', 'means normalized, L' is light to position, N' is normal
+    // http://math.stackexchange.com/questions/13261/how-to-get-a-reflection-vector
+    var L_ = photon.fromRay.direction.clone();
+    var N_ = photon.normal.clone();
+    photon.reflect.copy( L_.sub( N_.multiplyScalar( 2 * N_.dot(L_)) ) );
+
     return photon;
 }
 
@@ -99,8 +107,9 @@ Ray.prototype.intersectTriangle = function ( triangle, backfaceCulling, optional
         on: undefined,
         fromRay: new Ray(),
 
-        //reflaction side normal (photon.normal.dot( photon.fromRay.direction ) <= 0)
-        normal: new Vector3()
+        //reflection side normal (photon.normal.dot( photon.fromRay.direction ) <= 0)
+        normal: new Vector3(),
+        reflect:  new Vector3()
     };
 
     var a = triangle.a;
@@ -127,13 +136,13 @@ Ray.prototype.intersectTriangle = function ( triangle, backfaceCulling, optional
 
         if ( backfaceCulling ) { return null; }
         sign = 1;
-        photon.normal.copy( normal ).negate();
+        photon.normal.copy( normal ).negate().normalize();
 
     } else if ( DdN < 0 ) {
 
         sign = -1;
         DdN = -DdN;
-        photon.normal.copy( normal );
+        photon.normal.copy( normal ).normalize();
 
     } else {
         return null;
@@ -169,6 +178,11 @@ Ray.prototype.intersectTriangle = function ( triangle, backfaceCulling, optional
 
     // Ray intersects triangle.
     photon.position = this.at( QdN / DdN, optionalTarget );
+
+    var L_ = photon.fromRay.direction.clone();
+    var N_ = photon.normal.clone();
+    photon.reflect.copy( L_.sub( N_.multiplyScalar( 2 * N_.dot(L_)) ) );
+    
     return photon;
 }
 
