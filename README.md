@@ -27,6 +27,7 @@ Sphere Material
 ![](./img/x1.png)
 
 10532 photons collected
+
 render time: 93.978 seconds
 
 Sphere glossyFactor: 8
@@ -34,6 +35,7 @@ Sphere glossyFactor: 8
 ![](./img/x2.png)
 
 10481 photons collected
+
 render time: 91.478 seconds
 
 Sphere glossyFactor: 16
@@ -41,6 +43,7 @@ Sphere glossyFactor: 16
 ![](./img/x3.png)
 
 10288 photons collected
+
 render time: 90.121 seconds
 
 Sphere glossyFactor: 32
